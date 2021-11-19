@@ -1,0 +1,188 @@
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+    <!-- Bootstrap CSS -->
+    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" rel="stylesheet">
+
+    <title>SLR Parser</title>
+    <style>
+        hr{
+            height: 10px;
+            border-width:5px;
+        }
+    </style>
+</head>
+<body>
+<br>
+<div class="container bg-light text-center">
+    <div align-center="" class="col-12 pt-1 pb-2 text-center bg-info">
+        <h1>SLR(1) Parser</h1>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-4">
+            <h4>Sample Input (Non-Conflicting)</h4>
+            <textarea class="md-textarea form-control" disabled="" rows="7">
+S-&gt;aAcB
+A-&gt;bP
+P-&gt;Q
+P-&gt;cQ
+B-&gt;d
+            </textarea>
+        </div>
+        <div class="col-4">
+
+            <h4>Input</h4>
+            <form action="/" method="GET">
+                <textarea class="md-textarea form-control" name="q" rows="7"></textarea>
+                <br>
+                <input class="btn btn-success" type="submit">
+            </form>
+        </div>
+        <div class="col-4">
+            <h4>Sample Input (Conflicting)</h4>
+            <textarea class="md-textarea form-control" disabled="" rows="7">
+S-&gt;aPbSQ
+S-&gt;a
+Q-&gt;tS
+Q-&gt;
+P-&gt;r
+            </textarea>
+        </div>
+
+    </div>
+    <div class="row">
+        {% if data["success"] %}
+        {% if data["ans"] %}
+        <div class="col-12">
+            <div class="alert alert-success">
+                <strong>Success!</strong> View results below 👇
+            </div>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-danger">
+                <strong>Failure!</strong> Enter valid grammar, check sample inputs above 👆
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <hr>
+    {% if data["ans"] %}
+    <div class="row">
+        <div class="col-4">
+            <h4>Productions</h4>
+            <table class="table table-striped">
+                <tr>
+                    <th>
+                        No.
+                    </th>
+                    <th>
+                        Production
+                    </th>
+                </tr>
+                {% for p in data["productions"] %}
+                <tr>
+                    <td>
+                        {{ loop.index }}
+                    </td>
+                    <td>
+                        {{ p }}
+                    </td>
+                </tr>
+                    {%endfor%}
+            </table>
+        </div>
+        <div class="col-8">
+            <h4>First and Follow</h4>
+            <table class="table table-striped">
+                <tr>
+                    <th>
+                        Non Terminal
+                    </th>
+                    <th>
+                        First
+                    </th>
+                    <th>
+                        Follow
+                    </th>
+                </tr>
+                {% for nt in data["ff"] %}
+                <tr>
+                    <td>
+                        {{ nt }}
+                    </td>
+                    <td>
+                        { {% for v in data["ff"][nt]["first"] %} {{ v }},{%endfor%}}
+                    </td>
+                    <td>
+                        { {% for v in data["ff"][nt]["follow"] %} {{ v }},{%endfor%}}
+                    </td>
+                </tr>
+                    {%endfor%}
+            </table>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-12">
+            <h4>SLR(1) Table</h4>
+            <table id="slr" class="table table-striped">
+                {% for row in data["table"] %}
+                <tr>
+                    {% for ele in row %}
+                    <td>{{ ele }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <hr>
+
+    <div class="row">
+        <div class="col-12">
+            <h4> Results </h4>
+            {% if data["is_slr"] %}
+                <h5> The Grammar is accepted by SLR(1) 🎉 </h5>
+            {% else %}
+            <h5> The Grammar is <b>not</b> accepted by SLR(1) 🥲 </h5>
+                <p>
+                    There are conflicts! 😐 Shift-Reduce: {{ data["sr"]["count"] }} || Reduce-Reduce: {{ data["rr"]["count"] }}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    <hr>
+</div>
+
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script crossorigin="anonymous"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script crossorigin="anonymous"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+<script crossorigin="anonymous"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<script>
+    let cells = document.getElementById("slr").getElementsByTagName('td');
+    for (let i=0, len=cells.length; i<len; i++){
+    if (cells[i].innerHTML === "accept"){
+        cells[i].style.backgroundColor = '#d4edda';
+    }
+    else if (cells[i].innerHTML.indexOf(',') > -1){
+        cells[i].style.backgroundColor = '#f8d7da';
+    }
+}
+</script>
+</body>
+</html>
