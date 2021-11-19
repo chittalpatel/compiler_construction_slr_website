@@ -28,4 +28,4 @@ A WebApp which has an SLR parser on backend. You can enter grammar on frontend a
 
 ## Team
 
-[Chittal Patel](https://github.com/chittalpatel/) | [Darshil Chauhan]()
+[Chittal Patel](https://github.com/chittalpatel/) | [Darshil Chauhan](https://github.com/darshilx/)
